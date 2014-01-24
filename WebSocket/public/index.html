@@ -12,7 +12,7 @@
 	
 	<script src="libs/jquery.noty.packaged.min.js" type="text/javascript"></script>
   
-	<script>  
+	<script>
 	// Chat Model
 	var oModel = new sap.ui.model.json.JSONModel(),
 		names = ['Holger','Volker','Jörg','Klaudia','Dirk','Thomas'];
@@ -84,12 +84,13 @@
 	} 
 		
 	// UI5 User Interface
+			
 	var oUserField = new sap.ui.commons.TextField("userName", {
         value: "{/user}",
         tooltip: "Edit me"
 	});
 	
-	var oIPE1 = new sap.ui.commons.InPlaceEdit("IPE1",{
+	var oIPE = new sap.ui.commons.InPlaceEdit("IPE",{
 		content: oUserField
 	}).placeAt("username");	
 	
@@ -108,7 +109,7 @@
 	// attach key return handler for textinput
 	sap.ui.commons.TextField.prototype.onkeyup = function(oBrowserEvent) {
 		if (oBrowserEvent.keyCode === 13) sendMsg();
-	}; 
+	}; 	
 	
 	var oSendBtn = new sap.ui.commons.Button("sendBtn", {
         text: "Send",
