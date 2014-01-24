@@ -1,0 +1,17 @@
+{
+  "name": "UWebSocketChat",
+  "description": "UI5 Web Socket Chat example",
+  "version": "0.0.1",
+  "author": {
+	  "name": "Holger Schäfer",
+	  "email": "holger.schaefer@gmail.com"
+  },  
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "3.4.8",
+    "ws": "*"
+  }
+}

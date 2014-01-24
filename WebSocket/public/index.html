@@ -1,0 +1,130 @@
+<!DOCTYPE html>  
+<html><head>  
+    <meta http-equiv='X-UA-Compatible' content='IE=edge' /> 
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/> 
+    <title>WebSocket Chat</title>  
+    
+    <script id='sap-ui-bootstrap' 
+        src='https://openui5.hana.ondemand.com/resources/sap-ui-core.js'
+        data-sap-ui-theme='sap_bluecrystal'  
+        data-sap-ui-libs='sap.ui.commons'>
+	</script>   
+	
+	<script src="libs/jquery.noty.packaged.min.js" type="text/javascript"></script>
+  
+	<script>  
+	// Chat Model
+	var oModel = new sap.ui.model.json.JSONModel(),
+		names = ['Holger','Volker','Jörg','Klaudia','Dirk','Thomas'];
+	
+	oModel.setData({
+	    user: names[Math.floor(names.length * Math.random())],
+	    chat: ""
+	});
+	sap.ui.getCore().setModel(oModel);
+	
+	// WS handling
+	jQuery.sap.require("sap.ui.core.ws.WebSocket"); 	
+	var connection = new sap.ui.core.ws.WebSocket('ws://localhost:8080');
+
+	// connection opened 
+	connection.attachOpen(function (oControlEvent) {
+		notify('WebSocket', 'connection opened...', 'success');
+	});	
+			
+	// server messages
+	connection.attachMessage(function (oControlEvent) {
+		var data = jQuery.parseJSON(oControlEvent.getParameter('data')),
+			msg = data.user + ': ' + data.text,
+			lastInfo = oModel.oData.chat;
+			
+		if (lastInfo.length > 0) lastInfo += "\r\n";		
+		oModel.setData({chat: lastInfo + msg}, true); 
+				
+		// scroll to textarea bottom to show new messages
+		$('#chatInfo').scrollTop($('#chatInfo')[0].scrollHeight);
+		
+    	notify('onMessage', msg, 'information');	    	
+	});
+	
+	// error handling
+	connection.attachError(function (oControlEvent) {
+		notify('Websocket connection error', 'error');
+	});	
+		
+	// onConnectionClose
+	connection.attachClose(function (oControlEvent) {
+		notify('Websocket connection closed', 'warning');
+	});
+	
+	// send message
+	var sendMsg = function() {
+		var msg = oMsg.getValue();
+		if (msg.length > 0) {
+			connection.send(JSON.stringify(
+				{user: oModel.oData.user, text: msg}
+			));
+			notify('sendMessage', msg, 'alert');
+	    	oMsg.setValue(); 	// reset textfield
+	    	oMsg.focus();		// focus field	    		
+		}    	
+	}			
+	
+	// notifier	
+	function notify(title, text, type) {		
+		type = type || 'information'
+		// [alert|success|error|warning|information|confirm]		
+		noty({
+			text: text,
+			template: '<div class="noty_message"><b>' + title + ':</b>&nbsp;<span class="noty_text"></span><div class="noty_close"></div></div>',
+			layout: "topRight",
+			type: type,
+            timeout: 4000
+		});		
+	} 
+		
+	// UI5 User Interface
+	var oUserField = new sap.ui.commons.TextField("userName", {
+        value: "{/user}",
+        tooltip: "Edit me"
+	});
+	
+	var oIPE1 = new sap.ui.commons.InPlaceEdit("IPE1",{
+		content: oUserField
+	}).placeAt("username");	
+	
+	var oChatInfo = new sap.ui.commons.TextArea("chatInfo", {		
+		cols: 60,
+		rows: 8,
+		editable: false,
+		valueState : sap.ui.core.ValueState.Success,
+		value: "{/chat}"
+	}).placeAt("info");
+	
+	var oMsg = new sap.ui.commons.TextField("chatMsg", {
+        width: '20em'
+	}).placeAt("text");
+	
+	// attach key return handler for textinput
+	sap.ui.commons.TextField.prototype.onkeyup = function(oBrowserEvent) {
+		if (oBrowserEvent.keyCode === 13) sendMsg();
+	}; 
+	
+	var oSendBtn = new sap.ui.commons.Button("sendBtn", {
+        text: "Send",
+        press: function(oEvent) {
+        	sendMsg();
+        }	
+	}).placeAt("btn");		
+	</script>
+
+</head>
+<body class='sapUiBody'>
+<div style="padding: 10px">
+	<h2>WebSocket Chat</h2>
+	<div id="username"></div>
+	<div id='info' style="background-color: #cce8d8; border: 1px solid #bfbfbf; display: inline-block"></div>
+    <div><span id='text'></span><span id='btn'></span></div>
+</div>    
+</body>
+</html>
