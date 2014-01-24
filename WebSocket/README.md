@@ -2,14 +2,13 @@
 
 # WebSocket
 
-
+This is an UI5 example demonstrating Web Sockets 
 
 ## Usage
 
+Install needed node.js package:
 
-
-## Developing
-
+npm install express ws
 
 
 ### Tools
