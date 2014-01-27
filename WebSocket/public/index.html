@@ -29,7 +29,7 @@
 
 	// connection opened 
 	connection.attachOpen(function (oControlEvent) {
-		notify('WebSocket', 'connection opened...', 'success');
+		notify('onOpen', 'websocket connection opened...', 'success');
 	});	
 			
 	// server messages
@@ -49,12 +49,12 @@
 	
 	// error handling
 	connection.attachError(function (oControlEvent) {
-		notify('Websocket connection error', 'error');
+		notify('onError', 'Websocket connection error', 'error');
 	});	
 		
 	// onConnectionClose
 	connection.attachClose(function (oControlEvent) {
-		notify('Websocket connection closed', 'warning');
+		notify('onClose', 'Websocket connection closed', 'warning');
 	});
 	
 	// send message
